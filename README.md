@@ -1,8 +1,27 @@
-# Wallet-py3k
+# py-pkpass
 
-Python library to read/write [Apple Wallet](http://developer.apple.com/library/ios/#documentation/UserExperience/Conceptual/PassKit_PG/Chapters/Introduction.html#//apple_ref/doc/uid/TP40012195-CH1-SW1) (.pkpass) files
+Python library to read/write [Apple Wallet](http://developer.apple.com/library/ios/#documentation/UserExperience/Conceptual/PassKit_PG/Chapters/Introduction.html#//apple_ref/doc/uid/TP40012195-CH1-SW1) (.pkpass) files, see also [Pass Design and Creation](https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/PassKit_PG/Creating.html)
 
-This is a fork of https://github.com/ofw/wallet-py3k which does not suits my needs
+This is a fork of https://github.com/Bastian-Kuhn/wallet , the original fork https://github.com/devartis/passbook
+
+## Getting started 
+```bash
+git clone https://github.com/NafieAlhilaly/py-pkpass.git
+```
+move to py-pkpass dir
+```bash
+cd py-pkpass
+```
+
+create python virtual environment
+```bash
+python3 -m venv venv
+```
+
+activate your virtual environmetn
+```bash
+source <your-env-name>/bin/activate
+```
 
 
 ## New Features
@@ -14,11 +33,13 @@ This is a fork of https://github.com/ofw/wallet-py3k which does not suits my nee
 
 ## ToDos
   * Update of Getting Started
+  * Add docker-compose
+  * Validate data
+  * Add NFC support
   * Full Example including which Fields are Possible
 
 
-## Old: Getting Started
-This part from here needs to be updated:
+## Before creating a pkpass file you need to :
 
 1. Create a Pass Type Id:
     1. Visit the [Visit the iOS Provisioning Portal](https://developer.apple.com/account/resources/certificates/list)
@@ -53,38 +74,63 @@ This part from here needs to be updated:
 ## Typical Usage
 
 ```python
-    from wallet.models import Pass, Barcode, StoreCard
+from wallet.PassStyles import StoreCard
+from wallet.Pass import Pass
+from wallet.PassProps.Barcode import Barcode
+import uuid
+from wallet.Schemas.FieldProps import FieldProps
 
-    pass_type_identifier = "pass.com.yourcompany.some_name"
-    team_identifier = "ABCDE1234"  # Your Apple team ID
-    cert_pem = "certficate.pem"
-    key_pem = "key.pem"
-    wwdr_pem = "AppleWWDRCA.pem"
-    key_pem_password = "your_password"
 
-    cardInfo = StoreCard()
-    cardInfo.addPrimaryField('name', 'John Doe', 'Name')
+pass_type_identifier = "pass.com.yourcompany.some_name"
+team_identifier = "ABCDE123"  # Your Apple team ID
 
-    passfile = Pass(cardInfo,
-                    passTypeIdentifier=cls.pass_type_identifier,
-                    organizationName=cls.organization_name,
-                    teamIdentifier=cls.team_identifier)
+card = StoreCard()
+card.add_header_field(FieldProps(key="k2", value="69", label="Points"))
+card.add_secondary_field(FieldProps(key="k3", value="Small shark", label="Level"))
+card.add_back_field(FieldProps(key="k5", value="first backfield", label="bf1"))
 
-    # charge_response.id is trackable via the Stripe dashboard
-    passfile.serialNumber = charge_response.id
-    passfile.barcode = Barcode(message = charge_response.id, format=BarcodeFormat.PDF417)
-    passfile.description = charge_response.description 
+passfile = Pass(
+    **{
+        "pass_information": card,
+        "pass_type_identifier": pass_type_identifier,
+        "organization_name": "organization_name",
+        "team_identifier": team_identifier,
+    }
+)
 
-    # Including the icon and logo is necessary for the passbook to be valid.
-    passfile.addFile("icon.png", open("icon.png", "rb"))
-    passfile.addFile("logo.png", open("logo.png", "rb"))
-    _ = passfile.create(cls.cert_pem,
-                        cls.key_pem,
-                        cls.wwdr_pem,
-                        cls.key_pem_password,
-                        "pass_name.pkpass")
+passfile.logoText = "Sharks"
+
+# charge_response.id is trackable via the Stripe dashboard
+passfile.serialNumber = str(uuid.uuid4())
+passfile.barcodes.append(Barcode(message="testing", ))
+passfile.description = "some discription"
+passfile.backgroundColor = "rgb(38, 93, 205)"
+passfile.foregroundColor = "rgb(255, 255, 255)"
+passfile.labelColor = "rgb(189, 189, 189)"
+
+# Including the icon and logo is necessary for the passbook to be valid.
+
+passfile.add_file("icon.png", open("shark-icon.png", "rb"))
+passfile.add_file("icon@2x.png", open("shark-icon.png", "rb"))
+passfile.add_file("icon@3x.png", open("shark-icon.png", "rb"))
+
+passfile.add_file("logo.png", open("shark-icon.png", "rb"))
+passfile.add_file("logo@2x.png", open("shark-icon.png", "rb"))
+passfile.add_file("logo@3x.png", open("shark-icon.png", "rb"))
+
+passfile.add_file("strip.png", open("sea.jpg", "rb"))
+
+passfile.create(
+    "signerCert.pem",
+    "signerKey.pem",
+    "wwdr.pem",
+    password="password",
+    file_name="test_pass.pkpass",
+)
 
 ```
+
+[screenshot]()
 
 ### Notes
 
