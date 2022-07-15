@@ -1,5 +1,8 @@
 # py-pkpass
 
+https://img.shields.io/badge/Test-83%25-green
+
+
 Python library to read/write [Apple Wallet](http://developer.apple.com/library/ios/#documentation/UserExperience/Conceptual/PassKit_PG/Chapters/Introduction.html#//apple_ref/doc/uid/TP40012195-CH1-SW1) (.pkpass) files, see also [Pass Design and Creation](https://developer.apple.com/library/archive/documentation/UserExperience/Conceptual/PassKit_PG/Creating.html)
 
 This is a fork of https://github.com/Bastian-Kuhn/wallet , the original fork https://github.com/devartis/passbook
