@@ -331,6 +331,9 @@ class Pass:
             for ibeacon in self.ibeacons:
                 data["ibeacons"].append(ibeacon.json_dict())
 
+        if self.NFC:
+            data["nfc"] = self.NFC.json_dict()
+
         requied_fields = [
             "description",
             "formatVersion",
