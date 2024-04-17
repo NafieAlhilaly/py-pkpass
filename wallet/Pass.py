@@ -292,7 +292,8 @@ class Pass:
             "passTypeIdentifier",
             "serialNumber",
             "teamIdentifier",
-            "suppressStripShine" "relevantDate",
+            "suppressStripShine",
+            "relevantDate",
             "backgroundColor",
             "foregroundColor",
             "labelColor",
@@ -330,6 +331,9 @@ class Pass:
             data["ibeacons"] = []
             for ibeacon in self.ibeacons:
                 data["ibeacons"].append(ibeacon.json_dict())
+
+        if self.NFC:
+            data["nfc"] = self.NFC.json_dict()
 
         requied_fields = [
             "description",

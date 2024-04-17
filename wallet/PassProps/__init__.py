@@ -6,3 +6,4 @@ from .IBeacon import IBeacon
 from .Location import Location
 from .NumberStyle import NumberStyle
 from .TransitType import TransitType
+from .NFC import NFC
